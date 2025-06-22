@@ -1,11 +1,9 @@
-primeira parte do projeto e o Front-end qui tem três pastas
-assets,css,js,views
+Primeira parte do projeto: O Front-end contém três pastas: assets, css, js e views.
 
-dentro assets tem qui tem o fivecon qui é estatico 
-tem uma pasta images que conten as imagens do produtos 
+Dentro da pasta assets, há um arquivo favicon, que é estático, e uma pasta images, que contém as imagens dos produtos.
 
-pasta css conten um arquivo style que tens algun style da paginas
+A pasta css contém um arquivo style.css, que possui alguns estilos das páginas.
 
-paste js contem dois arquivos admin_produtos e arquivos que tens algumas funcão jquery 
+A pasta js contém dois arquivos: admin_produtos.js e outros arquivos.js que têm algumas funções em jQuery.
 
-pasta views tens as paginas do hmtl
+A pasta views contém as páginas HTML.
