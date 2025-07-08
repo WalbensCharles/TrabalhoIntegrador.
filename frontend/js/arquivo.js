@@ -12,66 +12,41 @@ $(document).ready(function() {
     });
 });
 
-//LOGIN 
-$(document).ready(function() {
-    $("#login-form").submit(function(e) {
-        e.preventDefault(); // Evita o comportamento padrão de envio do formulário
-
-        const email = $("#email").val();
-        const password = $("#senha").val();
-
-        // Enviar dados de login para o backend (supondo que você tenha um endpoint de login)
-        $.ajax({
-            url: "/api/login",  // Endpoint de login no backend
-            type: "POST",
-            data: { email, password },
-            success: function(response) {
-                // Salvar o token JWT no localStorage
-                localStorage.setItem("authToken", response.token);
-
-                // Redirecionar para a página de produtos após o login bem-sucedido
-                window.location.href = "produtos.html";
-            },
-            error: function(err) {
-                alert("Erro ao fazer login. Verifique suas credenciais.");
-            }
-        });
-    });
+// Logout
+$('#logout').on('click', function() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('usuarioLogado');
+    window.location.href = 'login2.html';
 });
 
+// Atualiza os cards do dashboard
+function atualizarDashboard() {
+    const token = localStorage.getItem("token");
+    const headers = { Authorization: "Bearer " + token };
 
-//finalizar 
+    // Total de usuários
+    axios.get('/dashboard/total-users', {headers})
+        .then(resp => $('#total-users').text(resp.data.total ?? 0))
+        .catch(() => $('#total-users').text('Erro'));
 
+    // Usuários ativos
+    axios.get('/dashboard/active-users', {headers})
+        .then(resp => $('#active-users').text(resp.data.ativos ?? 0))
+        .catch(() => $('#active-users').text('Erro'));
 
-$(document).ready(function() {
-    $(".buy-btn").click(function() {
-        // Verificar se o usuário está autenticado (token presente no localStorage)
-        const token = localStorage.getItem("authToken");
+    // total de pedidos
+    axios.get('/dashboard/total-orders', {headers})
+        .then(resp => $('#total-orders').text(resp.data.pedidos ?? 0))
+        .catch(() => $('#total-orders').text('Erro'));
 
-        if (!token) {
-            // Se não estiver logado, redirecionar para a página de login
-            window.location.href = "../views/login2.html"; // Página de login
-            return; // Interromper a execução, não permitir o redirecionamento para checkout
-        }
+    // total de produtos
+    axios.get('/dashboard/total-products', {headers})
+        .then(resp => $('#total-products').text(resp.data.produtos ?? 0))
+        .catch(() => $('#total-products').text('Erro'));
+}
 
-        // Se estiver logado, pegar os dados do produto
-        const productId = $(this).data("id");
-        const productName = $(this).data("name");
-        const productPrice = $(this).data("price");
-
-        // Salvar os dados do produto no localStorage
-        const productData = {
-            id: productId,
-            name: productName,
-            price: productPrice,
-            quantity: 1
-        };
-
-        // Salvar o produto no localStorage
-        localStorage.setItem("product", JSON.stringify(productData));
-
-        // Redirecionar para a página de checkout
-        window.location.href = "checkout.html";
-    });
+// inicializa dashboard ao carregar a página
+$(function() {
+    atualizarDashboard();
+    setInterval(atualizarDashboard, 30000); // atualiza a cada 30 segundos
 });
-
