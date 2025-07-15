@@ -1,16 +1,4 @@
-/*cor e font do body */
 
-$('body').css({
-    'background-color':'lightgray',
-    'font-family': 'Arial, sans-serif'
-});
-// Função para alternar entre o formulário de login e cadastro
-$(document).ready(function() {
-    $("#show-register").click(function() {
-        $("#login-form").hide(); // Esconde o formulário de login
-        $("#register-form").show(); // Exibe o formulário de cadastro
-    });
-});
 
 // Logout
 $('#logout').on('click', function() {

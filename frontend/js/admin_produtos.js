@@ -1,14 +1,17 @@
 //axios
-
 axios.defaults.baseURL = "http://localhost:3000/";
 axios.defaults.headers.common["Content-Type"] = "application/json;charset=utf-8";
 
 //verificar se é admin
-
 const isAdminPage = window.location.pathname.includes('admin');
 
-//cadastrar usuario
+// Função para obter header de autenticação
+function authHeader() {
+    const token = localStorage.getItem("token");
+    return token ? { Authorization: "Bearer " + token } : {};
+}
 
+//cadastrar usuario
 $(function() {
     if ($('#form-cadastrar').length) {
         $('#form-cadastrar').validate({
@@ -99,9 +102,7 @@ $(function() {
     });
 });
 
-
 //logout 
-
 $(function() {
     // Exibir o botão  logout se estiver logado
     if (localStorage.getItem("usuarioLogado") === "true" || localStorage.getItem("token")) {
@@ -110,17 +111,18 @@ $(function() {
         $("#logout").hide();
     }
 
-    // Ao clicar no botão, faz logout
+    // ao clicar no botão, faz logout
     $("#logout").on("click", function() {
         localStorage.removeItem('usuarioLogado');
         localStorage.removeItem('token');
+        localStorage.removeItem('usuarioId');
         alert("Logout realizado com sucesso!");
         window.location.href = 'login2.html';
     });
 });
 
 //interface admin e usuarios
-//crud --read
+//crud read
 function carregarProdutos() {
     const $container = $('#produtos-lista');
     if (!$container.length) return; // Protege páginas sem a div
@@ -139,7 +141,7 @@ function carregarProdutos() {
             }
             $container.html('');
             produtos.forEach(produto => {
-                // Cria os botões conforme a página
+                // cria os botões para admin
                 let acoesHtml = '';
                 if (isAdminPage) {
                     acoesHtml = `
@@ -241,10 +243,12 @@ $(function() {
         };
         try {
             if (id) {
-                await axios.put(`/produto/${id}`, produto);
+                // PUT protegido
+                await axios.put(`/produto/${id}`, produto, { headers: authHeader() });
                 mostrarMensagem('Produto atualizado com sucesso!');
             } else {
-                await axios.post('/produto', produto);
+                // POST protegido
+                await axios.post('/produto', produto, { headers: authHeader() });
                 mostrarMensagem('Produto cadastrado com sucesso!');
             }
             this.reset();
@@ -257,7 +261,7 @@ $(function() {
         }
     });
 
-    // Botão cancelar edição
+    // botão cancelar edição
     $('#btn-cancelar').on('click', function() {
         $('#novo-produto')[0].reset();
         $('#produto-id').val('');
@@ -266,7 +270,7 @@ $(function() {
     });
 });
 
-// Editar produto (admin)
+// editar produto
 function editarProdutoForm(id) {
     axios.get(`/produto/${id}`)
         .then(function(resp) {
@@ -285,20 +289,24 @@ function editarProdutoForm(id) {
         });
 }
 
-// Remover produto
+// remover produto
 function removerProduto(id) {
     if (!confirm('Deseja remover este produto?')) return;
-    axios.delete(`/produto/${id}`)
+    axios.delete(`/produto/${id}`, { headers: authHeader() })
         .then(function() {
             carregarProdutos();
             mostrarMensagem('Produto removido com sucesso!', 'success');
         })
-        .catch(function() {
-            mostrarMensagem('Erro ao remover produto!', 'danger');
+        .catch(function(error) {
+            let msg = "Erro ao remover produto!";
+            if (error.response && error.response.data && error.response.data.mensagem) {
+                msg = error.response.data.mensagem;
+            }
+            mostrarMensagem(msg, 'danger');
         });
 }
 
-// Mensagens de feedback (admin)
+// mensagens para (admin)
 function mostrarMensagem(msg, tipo='success') {
     const $msgDiv = $('#mensagem-produto');
     if ($msgDiv.length) {
@@ -306,4 +314,3 @@ function mostrarMensagem(msg, tipo='success') {
         setTimeout(() => $msgDiv.html(''), 3000);
     }
 }
-

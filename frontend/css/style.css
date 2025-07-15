@@ -1,6 +1,11 @@
+body {
+  background-color: #41b883;
+  font-family: Arial, sans-serif;
+}
+
 
 .navbar.navbar-expand-lg{
-    background-color: #A9A9A9 !important;
+    background-color: #ffffff !important;
 }
 
 
@@ -57,7 +62,7 @@ h1 {
 
 /* Estilos para o rodapé */
 .footer {
-    background-color:#A9A9A9;
+    background-color:#ffffff;
     color: rgb(0, 0, 0);
     padding: 20px 0;
     text-align: center;
@@ -65,20 +70,18 @@ h1 {
 }
 
 
-@media screnn and (min-width:600px){
-    body{background-color:lightgray;
+@media (max-width: 576px) {
+    h1.mb-4 {
+        font-size: 22px;      
+        margin-bottom: 16px;  
     }
-
-        
+    .table th, .table td {
+        font-size: 15px;      
+        padding: 6px 5px;     
+    }
 }
 
-@media screen and (min-width:900px){
-    body{
-        background-color: lightgray;
-    }
- 
-    
-}
+
 
 /*login*/
 /* Estilos para o body e containers */
@@ -133,8 +136,6 @@ a {
 a:hover {
     text-decoration: underline;
 }
-
-
 
 #dashboard-stats {
     display: flex;

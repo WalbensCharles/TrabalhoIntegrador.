@@ -76,3 +76,5 @@ async function carregarProdutos() {
   }
 }
 window.onload = carregarProdutos;
+
+

@@ -28,36 +28,37 @@ $(function() {
     setTimeout(function() {
       window.location.href = 'index.html';
     }, 2000);
+    return; // Não tenta registrar pedido se não tem produto
   }
 
-  // Envio do formulário de checkout - só UM handler!
+  // Envio do formulário de checkout
   $('#checkout-form').on('submit', async function(e) {
     e.preventDefault();
 
-    // Dados do produto
     var produtoCheckout = localStorage.getItem('produtoCheckout');
     if (!produtoCheckout) return;
 
     var produto = JSON.parse(produtoCheckout);
 
-    // Recupera dados do usuário logado
-    var usuarioId = localStorage.getItem('usuarioId');
-    if (!usuarioId) {
-      alert("Usuário não encontrado. Faça login novamente.");
+    // O backend já pega o userId do token, não precisa enviar usuario_id no body!
+    var endereco = $('#address').val();
+    var preco = produto.preco;
+
+    // Recupera token
+    var token = localStorage.getItem('token');
+    if (!token) {
+      alert("Você precisa estar logado para finalizar a compra.");
       window.location.href = 'login2.html';
       return;
     }
 
-    // Dados do formulário
-    var endereco = $('#address').val();
-    var preco = produto.preco;
-
     try {
       await axios.post('/checkout', {
-        usuario_id: usuarioId,
         produto_id: produto.id,
         preco: preco,
         endereco: endereco
+      }, {
+        headers: { Authorization: "Bearer " + token }
       });
 
       $('main').html(`
@@ -73,7 +74,11 @@ $(function() {
       }, 3000);
 
     } catch (err) {
-      alert('Erro ao registrar o pedido: ' + (err.response?.data?.error || err.message));
+      let msg = 'Erro ao registrar o pedido.';
+      if (err.response && err.response.data && (err.response.data.error || err.response.data.mensagem)) {
+        msg += ' ' + (err.response.data.error || err.response.data.mensagem);
+      }
+      alert(msg);
     }
   });
 });
