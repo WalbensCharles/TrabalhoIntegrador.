@@ -23,6 +23,7 @@ CREATE TABLE usuarios (
     ativo BOOLEAN DEFAULT TRUE
 );
 
+ALTER SEQUENCE usuarios_id_seq RESTART WITH 1;
 
 para criar tabela produtos:
 CREATE TABLE produtos (
@@ -62,6 +63,7 @@ CREATE TABLE pedido_itens (
     FOREIGN KEY (produto_id) REFERENCES produtos(id) ON DELETE CASCADE
 );
 
+NB: ALTER SEQUENCE usuarios_id_seq RESTART WITH 1;
 
 Dependencias para rodar o projeto:
 
@@ -81,3 +83,4 @@ senha : postgres
 
 ou mudar para sua preferencia 
  
+ exemplo:assets/images/Shopall_branca.png

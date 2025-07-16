@@ -11,7 +11,7 @@ const app = express();
 app.use(express.json());
 app.use(bodyParser.json());
 
-const db = pgp('postgres://postgres:postgres@localhost:5432/trabalhointegrador');
+const db = pgp('postgres://postgres:postgres@localhost:5432/programa');
 
 // busca os arquivos JS e CSS
 app.use(express.static(path.join(__dirname, "../frontend")));
@@ -114,10 +114,10 @@ app.post("/produto",
     verificarToken,
     soAdmin,
     [
-        body('nome').isLength({ min: 3, max: 100 }),
-        body('descricao').isLength({ min: 3, max: 200 }),
-        body('preco').isFloat({ min: 0 }),
-        body('imagem').isLength({ min: 3, max: 200 })
+        body('nome').isLength({ min: 3, max: 100 }).withMessage("nome do produto deve ter entre 3 e 100 caracteres."),
+        body('descricao').isLength({ min: 3, max: 200 }).withMessage("descrição do produto deve ter entre 3 e 200 caracteres."),
+        body('preco').isFloat({ min: 0 }).withMessage("preço do produto deve ser um valor numérico maior que 0."),
+        body('imagem').isLength({ min: 3, max: 200 }).withMessage("imagem do produto deve ter entre 3 e 200 caracteres.")
     ],
     async (req, res) => {
         const erros = validationResult(req);
@@ -132,7 +132,13 @@ app.post("/produto",
             );
             res.status(201).json(novoProduto);
         } catch (error) {
-            res.status(400).json({ error: error.message });
+            if (error.message.includes("duplicate key")) {
+                res.status(400).json({ error: "Produto já existe com esse nome." });
+            } else if (error.message.includes("connection")) {
+                res.status(500).json({ error: "Erro de conexão com o banco de dados. Verifique a configuração." });
+            } else {
+                res.status(400).json({ error: "Erro ao inserir produto no banco de dados. Tente novamente mais tarde." });
+            }
         }
     }
 );
